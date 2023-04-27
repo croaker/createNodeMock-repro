@@ -1,20 +1,39 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from "react";
+import { SafeAreaView, Text, View } from "react-native";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+interface Measure {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  pageX: number;
+  pageY: number;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  const [measure, setMeasure] = useState<Measure>();
+  const viewRef = useRef<View | null>(null);
+
+  const onLayout = () => {
+    console.log("onLayout() called");
+
+    viewRef.current?.measure((x, y, width, height, pageX, pageY) => {
+      console.log("measure() called");
+
+      setMeasure({ x, y, width, height, pageX, pageY });
+    });
+  };
+
+  return (
+    <SafeAreaView>
+      <View onLayout={onLayout} ref={viewRef}>
+        <Text>Measure:</Text>
+        <Text>
+          {measure
+            ? Object.values(measure).join("")
+            : ""}
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
